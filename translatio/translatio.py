@@ -15,7 +15,7 @@ logging.basicConfig(format='[%(asctime)s] Translatio [%(levelname)s]: %(message)
 
 
 class Translator():
-    def __init__(self, cfg: Dict[str, Any], checkpoint_folder: str = None, translate_rows: List = [], keep_rows: List = []):
+    def __init__(self, cfg: Dict[str, Any], checkpoint_folder: str = None, translate_columns: List = [], keep_columns: List = []):
         if not isinstance(cfg, dict):
             raise AttributeError('cfg is not a dictionary')
         if 'target_lang' not in cfg:
@@ -28,16 +28,16 @@ class Translator():
             cfg['per_request'] = 5
         if not isinstance(checkpoint_folder, str):
             raise AttributeError('checkpoint_folder is not a string')
-        if not isinstance(translate_rows, list):
-            raise AttributeError('translate_rows is not a list')
-        if not isinstance(keep_rows, list):
-            raise AttributeError('keep_rows is not a string')
-        if len(translate_rows) == 0:
-            raise AttributeError('translate_rows is empty')
+        if not isinstance(translate_columns, list):
+            raise AttributeError('translate_columns is not a list')
+        if not isinstance(keep_columns, list):
+            raise AttributeError('keep_columns is not a string')
+        if len(translate_columns) == 0:
+            raise AttributeError('translate_columns is empty')
 
         self.checkpoint_folder = checkpoint_folder
-        self.translate_rows = translate_rows
-        self.keep_rows = keep_rows
+        self.translate_columns = translate_columns
+        self.keep_columns = keep_columns
 
         if os.path.exists(os.path.join(self.checkpoint_folder, 'config.json')):
             self.cfg = self._read_config()
@@ -55,7 +55,7 @@ class Translator():
         use_cols = []
 
         for r in df.columns:
-            if r in self.translate_rows or r in self.keep_rows:
+            if r in self.translate_columns or r in self.keep_columns:
                 use_cols.append(r)
 
         self.use_cols = use_cols
@@ -109,8 +109,8 @@ class Translator():
         return len(glob(os.path.join(self.checkpoint_folder, 'temp_*.tsv')))
     
     def translate(self, data: List[Dict]):
-        translate = self.translate_rows
-        keep = self.keep_rows
+        translate = self.translate_columns
+        keep = self.keep_columns
         
         translated_data = {}
         to_translate = {x: [d[x] for d in data] for x in translate}
